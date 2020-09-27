@@ -10,33 +10,76 @@ app.get("/", (request, response) => {
   response.sendFile(__dirname + "/views/index.html");
 });
 
-app.get("/image", (request, response) => {
+app.get("/title", (request, response) => {
   response.setHeader('Content-Type', 'image/png;charset=UTF-8');
   const text = swapEmoji(request.query.text)
-  const canvas = drawImage(text);
+  const canvas = drawTitle(text);
   const stream = canvas.createPNGStream();
   stream.pipe(response)
 });
 
-const PADDING = 100
+app.get("/note", (request, response) => {
+  response.setHeader('Content-Type', 'image/png;charset=UTF-8');
+  const text = swapEmoji(request.query.text)
+  const canvas = drawNote(text, request.query.date);
+  const stream = canvas.createPNGStream();
+  stream.pipe(response)
+});
+
 const WIDTH = 900
 const HEIGHT = 400
-const FONT = 50
 
-function drawImage(string) {
+function createBase() {
   const canvas = createCanvas(WIDTH, HEIGHT)
   const ctx = canvas.getContext('2d')
   ctx.rect(0, 0, WIDTH, HEIGHT)
   ctx.fillStyle = '#f9f9f9'
   ctx.fill()
   ctx.fillStyle = '#454545'
+  return [canvas, ctx]
+}
 
-  ctx.font = `${FONT}px 'noto, jetBrains'`
-  const lines = string.match(/\n/g) ? string.match(/\n/g).length : 1
-  ctx.fillText(string, PADDING, 150)
+function drawTitle(string) {
+  const PADDING = 100
+  const [canvas, ctx] = createBase()
+  ctx.font = `50px 'jetBrains, noto'`
+  ctx.fillText(string, PADDING, PADDING*1.5)
 
-  ctx.font = '30px monospace'
+  ctx.font = '30px jetBrains, noto'
   ctx.fillText('@ muan.co', PADDING, HEIGHT - PADDING)
+  return canvas
+}
+
+function drawNote(string, date = '') {
+  const PADDING = 70
+  const MAX = 42
+  const MAXLINES = 5
+  const [canvas, ctx] = createBase()
+  ctx.font = `30px 'jetBrains, noto'`
+
+  let wrappedString = ''
+  let currentLine = ''
+  let lines = 1
+  for (const word of string.split(' ')) {
+    if (currentLine.length + word.length > MAX) {
+      wrappedString += `\n${word}`
+      currentLine = word
+      lines += 1
+    } else {
+      currentLine += ` ${word}`
+      wrappedString += ` ${word}`
+    }
+
+    if (lines === MAXLINES) {
+      wrappedString += '...'
+      break
+    }
+  }
+  
+  ctx.fillText(wrappedString.trim(), PADDING, PADDING * 1.5)
+
+  ctx.font = '30px jetBrains'
+  ctx.fillText(`${date ? date + ' ' : ''}@ muan.co`, PADDING, HEIGHT - PADDING)
   return canvas
 }
 
