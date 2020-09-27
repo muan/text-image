@@ -7,10 +7,11 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.17.1",
     "canvas": "2.6.1",
+    "express": "^4.17.1",
+    "page-metadata-parser": "^1.1.4",
     "request": "2.81.0",
-    "page-metadata-parser": "^1.1.4"
+    "unicode-emoji-json": "0.0.4"
   },
   "engines": {
     "node": "12.x"

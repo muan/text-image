@@ -4,32 +4,16 @@ const { createCanvas, registerFont } = require('canvas')
 registerFont('./NotoEmoji-Regular.ttf', {family: 'noto'})
 registerFont('./JetBrainsMono-Regular.ttf', {family: 'jetBrains'})
 const request = require('request')
+const data = require ('unicode-emoji-json')
 
 app.get("/", (request, response) => {
   response.sendFile(__dirname + "/views/index.html");
 });
 
 app.get("/image", (request, response) => {
-  console.log('req---', request)
   response.setHeader('Content-Type', 'image/png;charset=UTF-8');
-  //   if (!request.query.url) {
-  //     response.sendFile(__dirname + "/views/index.html");
-  //     return
-  //   }
-
-  //   const url = new URL(request.query.url)
-  //   if (url.hostname !== 'muan.co') {
-  //     response.sendFile(__dirname + "/views/index.html");
-  //     return
-  //   }
-
-  //   request(request.query.url, (err, res, body) => {
-  //     if (err) { return console.log(err); }
-  //     console.log(body.url);
-  //     console.log(body);
-  //   });
-
-  const canvas = drawImage(request.query.text);
+  const text = swapEmoji(request.query.text)
+  const canvas = drawImage(text);
   const stream = canvas.createPNGStream();
   stream.pipe(response)
 });
@@ -54,6 +38,14 @@ function drawImage(string) {
   ctx.font = '30px monospace'
   ctx.fillText('@ muan.co', PADDING, HEIGHT - PADDING)
   return canvas
+}
+
+function swapEmoji(str) {
+  return str.trim().split(/(:[^:]+:)/).map(text => {
+    const [_1, emojiName] = text.match(/^:(\w+):$/) || []
+    const emoji = emojiName ? Object.keys(data).find(e => data[e].name === emojiName) || text : null
+    return emoji || text
+  }).join('')
 }
 
 // listen for requests :)
