@@ -10,7 +10,8 @@ app.get("/", (request, response) => {
 });
 
 app.get("/image", (request, response) => {
-  response.setHeader('Content-Type', 'image/png');
+  console.log('req---', request)
+  response.setHeader('Content-Type', 'image/png;charset=UTF-8');
   //   if (!request.query.url) {
   //     response.sendFile(__dirname + "/views/index.html");
   //     return
