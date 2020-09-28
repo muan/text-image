@@ -43,7 +43,7 @@ function drawTitle(string) {
   const PADDING = 100
   const [canvas, ctx] = createBase()
   ctx.font = `70px 'jetBrains, noto'`
-  ctx.fillText(string, PADDING, PADDING)
+  ctx.fillText(string, PADDING, PADDING * 1.5)
 
   ctx.font = '40px jetBrains, noto'
   ctx.fillText('@ muan.co', PADDING, HEIGHT - PADDING)
