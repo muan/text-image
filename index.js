@@ -26,8 +26,8 @@ app.get("/note", (request, response) => {
   stream.pipe(response)
 });
 
-const WIDTH = 900
-const HEIGHT = 400
+const WIDTH = 1200
+const HEIGHT = 630
 
 function createBase() {
   const canvas = createCanvas(WIDTH, HEIGHT)
@@ -42,20 +42,20 @@ function createBase() {
 function drawTitle(string) {
   const PADDING = 100
   const [canvas, ctx] = createBase()
-  ctx.font = `50px 'jetBrains, noto'`
-  ctx.fillText(string, PADDING, PADDING*1.5)
+  ctx.font = `70px 'jetBrains, noto'`
+  ctx.fillText(string, PADDING, PADDING)
 
-  ctx.font = '30px jetBrains, noto'
+  ctx.font = '40px jetBrains, noto'
   ctx.fillText('@ muan.co', PADDING, HEIGHT - PADDING)
   return canvas
 }
 
 function drawNote(string, date = '') {
-  const PADDING = 70
-  const MAX = 42
+  const PADDING = 100
+  const MAX = 35
   const MAXLINES = 5
   const [canvas, ctx] = createBase()
-  ctx.font = `30px 'jetBrains, noto'`
+  ctx.font = `50px 'jetBrains, noto'`
 
   let wrappedString = ''
   let currentLine = ''
@@ -78,7 +78,7 @@ function drawNote(string, date = '') {
   
   ctx.fillText(wrappedString.trim(), PADDING, PADDING * 1.5)
 
-  ctx.font = '30px jetBrains'
+  ctx.font = '40px jetBrains'
   ctx.fillText(`${date ? date + ' ' : ''}@ muan.co`, PADDING, HEIGHT - PADDING)
   return canvas
 }
