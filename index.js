@@ -1,26 +1,25 @@
 const express = require("express");
 const app = express();
-const { createCanvas, registerFont } = require('canvas')
-registerFont('./NotoEmoji-Regular.ttf', {family: 'noto'})
-registerFont('./JetBrainsMono-Regular.ttf', {family: 'jetBrains'})
-const request = require('request')
-const data = require ('unicode-emoji-json')
+const path = require("path")
+const { loadImage, createCanvas, registerFont } = require('canvas')
+registerFont('./ReadexPro-SemiBold.ttf', {family: 'readex', weight: 'bold'})
+registerFont('./ReadexPro-Medium.ttf', {family: 'readex'})
 
-app.get("/", (request, response) => {
+app.get("/", (_, response) => {
   response.sendFile(__dirname + "/views/index.html");
 });
 
-app.get("/title", (request, response) => {
+app.get("/title", async (request, response) => {
   response.setHeader('Content-Type', 'image/png;charset=UTF-8');
-  const text = swapEmoji(request.query.text)
-  const canvas = drawTitle(text);
+  const text = request.query.text;
+  const canvas = await drawTitle(text, request.query.size || 100);
   const stream = canvas.createPNGStream();
   stream.pipe(response)
 });
 
 app.get("/note", (request, response) => {
   response.setHeader('Content-Type', 'image/png;charset=UTF-8');
-  const text = swapEmoji(request.query.text)
+  const text = request.query.text;
   const canvas = drawNote(text, request.query.date);
   const stream = canvas.createPNGStream();
   stream.pipe(response)
@@ -39,23 +38,31 @@ function createBase() {
   return [canvas, ctx]
 }
 
-function drawTitle(string) {
+async function drawTitle(string, size) {
   const PADDING = 100
   const [canvas, ctx] = createBase()
-  ctx.font = `70px 'jetBrains, noto'`
-  ctx.fillText(string, PADDING, PADDING * 1.5)
+  ctx.fillStyle = '#767676'
+  ctx.font = `40px 'readex'`
+  ctx.fillText('muan.co', PADDING, PADDING * 1.5)
 
-  ctx.font = '40px jetBrains, noto'
-  ctx.fillText('@ muan.co', PADDING, HEIGHT - PADDING)
+  ctx.fillStyle = '#222222'
+  ctx.font = `normal 600 ${size}px 'readex'`
+  ctx.fillText(string, PADDING - size / 25, PADDING + 20 + size * 1.4)
+
+  const logoWidth = 100 * 0.8
+  const logoHeight = 86 * 0.8
+  const image = await loadImage('./logo.png')
+  ctx.drawImage(image, PADDING, HEIGHT - PADDING - logoHeight, logoWidth, logoHeight)
   return canvas
 }
+
 
 function drawNote(string, date = '') {
   const PADDING = 100
   const MAX = 35
   const MAXLINES = 5
   const [canvas, ctx] = createBase()
-  ctx.font = `50px 'jetBrains, noto'`
+  ctx.font = `50px 'readex'`
 
   let wrappedString = ''
   let currentLine = ''
@@ -81,14 +88,6 @@ function drawNote(string, date = '') {
   ctx.font = '40px jetBrains'
   ctx.fillText(`${date ? date + ' ' : ''}@ muan.co`, PADDING, HEIGHT - PADDING)
   return canvas
-}
-
-function swapEmoji(str) {
-  return str.trim().split(/(:[^:]+:)/).map(text => {
-    const [_1, emojiName] = text.match(/^:(\w+):$/) || []
-    const emoji = emojiName ? Object.keys(data).find(e => data[e].name === emojiName) || text : null
-    return emoji || text
-  }).join('')
 }
 
 // listen for requests :)
