@@ -1,29 +1,28 @@
-const express = require("express");
-const app = express();
-const path = require("path")
+const express = require("express")
+const app = express()
 const { loadImage, createCanvas, registerFont } = require('canvas')
 registerFont('./ReadexPro-SemiBold.ttf', {family: 'readex', weight: 'bold'})
 registerFont('./ReadexPro-Medium.ttf', {family: 'readex'})
 
 app.get("/", (_, response) => {
-  response.sendFile(__dirname + "/views/index.html");
-});
+  response.sendFile(__dirname + "/views/index.html")
+})
 
 app.get("/title", async (request, response) => {
-  response.setHeader('Content-Type', 'image/png;charset=UTF-8');
-  const text = request.query.text;
-  const canvas = await drawTitle(text, request.query.size || 100);
-  const stream = canvas.createPNGStream();
+  response.setHeader('Content-Type', 'image/pngcharset=UTF-8')
+  const text = request.query.text
+  const canvas = await drawTitle(text, request.query.size || 100)
+  const stream = canvas.createPNGStream()
   stream.pipe(response)
-});
+})
 
 app.get("/note", (request, response) => {
-  response.setHeader('Content-Type', 'image/png;charset=UTF-8');
-  const text = request.query.text;
-  const canvas = drawNote(text, request.query.date);
-  const stream = canvas.createPNGStream();
+  response.setHeader('Content-Type', 'image/pngcharset=UTF-8')
+  const text = request.query.text
+  const canvas = drawNote(text, request.query.date)
+  const stream = canvas.createPNGStream()
   stream.pipe(response)
-});
+})
 
 const WIDTH = 1200
 const HEIGHT = 630
@@ -42,11 +41,11 @@ async function drawTitle(string, size) {
   const PADDING = 100
   const [canvas, ctx] = createBase()
   ctx.fillStyle = '#767676'
-  ctx.font = `40px 'readex'`
+  ctx.font = `40px readex`
   ctx.fillText('muan.co', PADDING, PADDING * 1.5)
 
   ctx.fillStyle = '#222222'
-  ctx.font = `normal 600 ${size}px 'readex'`
+  ctx.font = `normal 600 ${size}px readex`
   ctx.fillText(string, PADDING - size / 25, PADDING + 20 + size * 1.4)
 
   const logoWidth = 100 * 0.8
@@ -62,7 +61,7 @@ function drawNote(string, date = '') {
   const MAX = 35
   const MAXLINES = 5
   const [canvas, ctx] = createBase()
-  ctx.font = `50px 'readex'`
+  ctx.font = `50px readex`
 
   let wrappedString = ''
   let currentLine = ''
@@ -85,12 +84,12 @@ function drawNote(string, date = '') {
   
   ctx.fillText(wrappedString.trim(), PADDING, PADDING * 1.5)
 
-  ctx.font = '40px jetBrains'
+  ctx.font = '40px readex'
   ctx.fillText(`${date ? date + ' ' : ''}@ muan.co`, PADDING, HEIGHT - PADDING)
   return canvas
 }
 
 // listen for requests :)
 const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log("Your app is listening on port " + listener.address().port);
-});
+  console.log("Your app is listening on port " + listener.address().port)
+})
